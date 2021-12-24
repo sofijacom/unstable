@@ -13,13 +13,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: x86
-            compat-distro-version: bullseye
           - arch: x86_64
-            compat-distro-version: bullseye64
+            compat-distro-version: sid64
     steps:
     - name: Clone woof-CE
-      run: git clone -b stable --depth 1 https://github.com/puppylinux-woof-CE/woof-CE ../woof-CE
+      run: git clone -b testing --depth 1 https://github.com/puppylinux-woof-CE/woof-CE ../woof-CE
     - name: Create cache directories
       run: |
         mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
@@ -45,7 +43,7 @@ jobs:
         cd ../woof-CE
         yes "" | sudo -E ./merge2out woof-distro/${{ matrix.arch }}/debian/${{ matrix.compat-distro-version }}
     - name: Set distro version
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=9.0.${{ github.run_number }}/ ../woof-out_*/DISTRO_SPECS
+      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=9.9.${{ github.run_number }}/ ../woof-out_*/DISTRO_SPECS
     - name: 0setup
       timeout-minutes: 10
       run: |
@@ -68,7 +66,7 @@ jobs:
         branch: testing
         workflow: kernel-kit.yml
         workflow_conclusion: success
-        name: kernel-kit-output-5.10.x-${{ matrix.arch }}
+        name: kernel-kit-output-5.15.x-${{ matrix.arch }}
         path: output
     - name: Move cached kernel-kit output
       run: sudo mv output ../woof-out_*/kernel-kit/
@@ -115,15 +113,15 @@ jobs:
         sudo -E HOME=/root ./3builddistro release
         sudo mv -vf woof-output-*/*.iso $GITHUB_WORKSPACE/
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
-        sudo mv kernel-kit/output/kernel_sources-5.10-kernel-kit.sfs $GITHUB_WORKSPACE/
+        sudo mv kernel-kit/output/kernel_sources-5.15-kernel-kit.sfs $GITHUB_WORKSPACE/
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: vanilladpup-${{ matrix.arch }}-9.0.${{ github.run_number }}
-        release_name: vanilladpup-${{ matrix.arch }}-9.0.${{ github.run_number }}
+        tag_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
+        release_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
         prerelease: false
     - name: Upload ISO image
       uses: actions/upload-release-asset@v1
@@ -131,8 +129,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.0.${{ github.run_number }}.iso
-        asset_name: vanilladpup-9.0.${{ github.run_number }}.iso
+        asset_path: vanilladpup-9.9.${{ github.run_number }}.iso
+        asset_name: vanilladpup-9.9.${{ github.run_number }}.iso
         asset_content_type: application/octet-stream
     - name: Upload BIOS image
       uses: actions/upload-release-asset@v1
@@ -140,8 +138,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.0.${{ github.run_number }}-ext4-2gb-bios.img.gz
-        asset_name: vanilladpup-9.0.${{ github.run_number }}-ext4-2gb-bios.img.gz
+        asset_path: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-bios.img.gz
+        asset_name: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-bios.img.gz
         asset_content_type: application/octet-stream
     - name: Upload UEFI image
       if: matrix.arch == 'x86_64'
@@ -150,8 +148,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.0.${{ github.run_number }}-ext4-2gb-uefi.img.gz
-        asset_name: vanilladpup-9.0.${{ github.run_number }}-ext4-2gb-uefi.img.gz
+        asset_path: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-uefi.img.gz
+        asset_name: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-uefi.img.gz
         asset_content_type: application/octet-stream
     - name: Upload update tarball
       uses: actions/upload-release-asset@v1
@@ -159,8 +157,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.0.${{ github.run_number }}.tar
-        asset_name: vanilladpup-9.0.${{ github.run_number }}.tar
+        asset_path: vanilladpup-9.9.${{ github.run_number }}.tar
+        asset_name: vanilladpup-9.9.${{ github.run_number }}.tar
         asset_content_type: application/octet-stream
     - name: Upload devx
       uses: actions/upload-release-asset@v1
@@ -168,8 +166,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: devx_vanilladpup_9.0.${{ github.run_number }}.sfs
-        asset_name: devx_vanilladpup_9.0.${{ github.run_number }}.sfs
+        asset_path: devx_vanilladpup_9.9.${{ github.run_number }}.sfs
+        asset_name: devx_vanilladpup_9.9.${{ github.run_number }}.sfs
         asset_content_type: application/octet-stream
     - name: Upload docx
       uses: actions/upload-release-asset@v1
@@ -177,8 +175,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: docx_vanilladpup_9.0.${{ github.run_number }}.sfs
-        asset_name: docx_vanilladpup_9.0.${{ github.run_number }}.sfs
+        asset_path: docx_vanilladpup_9.9.${{ github.run_number }}.sfs
+        asset_name: docx_vanilladpup_9.9.${{ github.run_number }}.sfs
         asset_content_type: application/octet-stream
     - name: Upload nlsx
       uses: actions/upload-release-asset@v1
@@ -186,8 +184,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: nlsx_vanilladpup_9.0.${{ github.run_number }}.sfs
-        asset_name: nlsx_vanilladpup_9.0.${{ github.run_number }}.sfs
+        asset_path: nlsx_vanilladpup_9.9.${{ github.run_number }}.sfs
+        asset_name: nlsx_vanilladpup_9.9.${{ github.run_number }}.sfs
         asset_content_type: application/octet-stream
     - name: Upload kernel sources
       uses: actions/upload-release-asset@v1
@@ -195,14 +193,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: kernel_sources-5.10-kernel-kit.sfs
-        asset_name: kernel_sources-5.10-kernel-kit.sfs
+        asset_path: kernel_sources-5.15-kernel-kit.sfs
+        asset_name: kernel_sources-5.15-kernel-kit.sfs
         asset_content_type: application/octet-stream
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@v0.2.0
       with:
         keep_latest: 2
-        delete_tag_pattern: vanilladpup-${{ matrix.arch }}-9.0.
+        delete_tag_pattern: vanilladpup-${{ matrix.arch }}-9.9.
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
