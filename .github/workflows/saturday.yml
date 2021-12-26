@@ -97,10 +97,6 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y --no-install-recommends patchelf extlinux
-    - name: Install cdrtools
-      run: |
-        [ -f local-repositories/mkisofs ] || (curl -L https://sourceforge.net/projects/cdrtools/files/alpha/cdrtools-3.02a09.tar.bz2/download | tar -xjf- && cd cdrtools-3.02 && make -j`nproc` && mv mkisofs/OBJ/x86_64-linux-cc/mkisofs ../local-repositories/mkisofs)
-        sudo install -m 755 local-repositories/mkisofs /usr/local/bin/mkisofs
     - name: 3builddistro
       timeout-minutes: 180
       run: |
@@ -110,8 +106,6 @@ jobs:
         sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config BUILD_ISO=no FRUGALIFY=yes ./3builddistro release
         for i in woof-output-*/*.img; do sudo gzip -1 $i; done
         sudo mv -vf woof-output-*/*.{sfs,img.gz,tar} $GITHUB_WORKSPACE/
-        sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config ./3builddistro release
-        sudo mv -vf woof-output-*/*.iso $GITHUB_WORKSPACE/
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
         sudo mv kernel-kit/output/kernel_sources-5.15-kernel-kit.sfs $GITHUB_WORKSPACE/
     - name: Create Release
@@ -123,15 +117,6 @@ jobs:
         tag_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
         release_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
         prerelease: false
-    - name: Upload ISO image
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.9.${{ github.run_number }}.iso
-        asset_name: vanilladpup-9.9.${{ github.run_number }}.iso
-        asset_content_type: application/octet-stream
     - name: Upload BIOS image
       uses: actions/upload-release-asset@v1
       env:
@@ -159,33 +144,6 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: vanilladpup-9.9.${{ github.run_number }}.tar
         asset_name: vanilladpup-9.9.${{ github.run_number }}.tar
-        asset_content_type: application/octet-stream
-    - name: Upload devx
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: devx_vanilladpup_9.9.${{ github.run_number }}.sfs
-        asset_name: devx_vanilladpup_9.9.${{ github.run_number }}.sfs
-        asset_content_type: application/octet-stream
-    - name: Upload docx
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: docx_vanilladpup_9.9.${{ github.run_number }}.sfs
-        asset_name: docx_vanilladpup_9.9.${{ github.run_number }}.sfs
-        asset_content_type: application/octet-stream
-    - name: Upload nlsx
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: nlsx_vanilladpup_9.9.${{ github.run_number }}.sfs
-        asset_name: nlsx_vanilladpup_9.9.${{ github.run_number }}.sfs
         asset_content_type: application/octet-stream
     - name: Upload kernel sources
       uses: actions/upload-release-asset@v1
