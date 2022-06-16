@@ -17,7 +17,7 @@ jobs:
             compat-distro-version: bookworm64
     steps:
     - name: Clone woof-CE
-      run: git clone -b testing --depth 1 https://github.com/puppylinux-woof-CE/woof-CE ../woof-CE
+      run: git clone -b vanilladpup-9.9.x --depth 1 https://github.com/vanilla-dpup/woof-CE ../woof-CE
     - name: Create cache directories
       run: |
         mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
@@ -103,17 +103,23 @@ jobs:
     - name: Install 3builddistro dependencies
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends patchelf dc extlinux debootstrap
+        sudo apt-get install -y --no-install-recommends patchelf dc debootstrap
+    - name: Install cdrtools
+      run: |
+        [ -f local-repositories/mkisofs ] || (curl -L https://sourceforge.net/projects/cdrtools/files/alpha/cdrtools-3.02a09.tar.bz2/download | tar -xjf- && cd cdrtools-3.02 && make -j`nproc` && mv mkisofs/OBJ/x86_64-linux-cc/mkisofs ../local-repositories/mkisofs)
+        sudo install -m 755 local-repositories/mkisofs /usr/local/bin/mkisofs
     - name: 3builddistro
       timeout-minutes: 180
       run: |
         sudo chown -R root:root petbuild-output
         sudo mv petbuild-{sources,cache,output} ../woof-out_*/
         cd ../woof-out_*
-        sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config BUILD_ISO=no FRUGALIFY=yes ./3builddistro release
-        for i in woof-output-*/*.img; do sudo gzip -1 $i; done
-        sudo mv -vf woof-output-*/*.{img.gz,tar} $GITHUB_WORKSPACE/
+        sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config ./3builddistro release
+        sudo mv -vf woof-output-*/*.iso $GITHUB_WORKSPACE/
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
+        sudo mv kernel-kit/output/kernel_sources-*.sfs woof-output-*/
+        cd woof-output-*
+        sudo tar -f $GITHUB_WORKSPACE/vanilladpup-9.9.${{ github.run_number }}-extra.tar -c docx_vanilladpup_9.9.${{ github.run_number }}.sfs nlsx_vanilladpup_9.9.${{ github.run_number }}.sfs kernel_sources-*.sfs
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -123,33 +129,23 @@ jobs:
         tag_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
         release_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
         prerelease: false
-    - name: Upload BIOS image
+    - name: Upload ISO image
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-bios.img.gz
-        asset_name: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-bios.img.gz
+        asset_path: vanilladpup-9.9.${{ github.run_number }}.iso
+        asset_name: vanilladpup-9.9.${{ github.run_number }}.iso
         asset_content_type: application/octet-stream
-    - name: Upload UEFI image
-      if: matrix.arch == 'x86_64'
+    - name: Upload extras
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-uefi.img.gz
-        asset_name: vanilladpup-9.9.${{ github.run_number }}-ext4-2gb-uefi.img.gz
-        asset_content_type: application/octet-stream
-    - name: Upload update tarball
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.9.${{ github.run_number }}.tar
-        asset_name: vanilladpup-9.9.${{ github.run_number }}.tar
+        asset_path: vanilladpup-9.9.${{ github.run_number }}-extra.tar
+        asset_name: vanilladpup-9.9.${{ github.run_number }}-extra.tar
         asset_content_type: application/octet-stream
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@v0.2.0
