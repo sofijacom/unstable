@@ -15,8 +15,13 @@ jobs:
         include:
           - arch: x86_64
             compat-distro-version: bookworm64
+            variant: dwl
+          - arch: x86_64
+            compat-distro-version: bookworm64
+            variant: xwayland
           - arch: x86
             compat-distro-version: bookworm
+            variant: xwayland
     steps:
     - name: Clone woof-CE
       run: git clone -b vanilladpup-9.9.x --depth 1 https://github.com/vanilla-dpup/woof-CE ../woof-CE
@@ -57,17 +62,17 @@ jobs:
       timeout-minutes: 10
       run: |
         cd ../woof-out_*
-        sudo -E ./0setup
+        sudo -E DISTRO_VARIANT=${{ matrix.variant }} ./0setup
     - name: 1download
       timeout-minutes: 120
       run: |
         cd ../woof-out_*
-        sudo -E ./1download
+        sudo -E DISTRO_VARIANT=${{ matrix.variant }} ./1download
     - name: 2createpackages
       timeout-minutes: 30
       run: |
         cd ../woof-out_*
-        echo | sudo -E ./2createpackages
+        echo | sudo -E DISTRO_VARIANT=${{ matrix.variant }} ./2createpackages
     - name: Get cached kernel-kit output
       uses: dawidd6/action-download-artifact@v2
       with:
@@ -117,7 +122,7 @@ jobs:
         sudo chown -R root:root petbuild-output
         sudo mv petbuild-{sources,cache,output} ../woof-out_*/
         cd ../woof-out_*
-        sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config ./3builddistro release
+        sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config DISTRO_VARIANT=${{ matrix.variant }} ./3builddistro release
         sudo mv -vf woof-output-*/*.iso $GITHUB_WORKSPACE/
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
         sudo mv kernel-kit/output/kernel_sources-*.sfs woof-output-*/
@@ -129,8 +134,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
-        release_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}
+        tag_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}-${{ matrix.variant }}
+        release_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}-${{ matrix.variant }}
         prerelease: false
     - name: Upload ISO image
       uses: actions/upload-release-asset@v1
