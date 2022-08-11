@@ -24,7 +24,7 @@ jobs:
             variant: xwayland
     steps:
     - name: Clone woof-CE
-      run: git clone -b vanilladpup-9.9.x --depth 1 https://github.com/vanilla-dpup/woof-CE ../woof-CE
+      run: git clone -b vanilladpup-10.0.x --depth 1 https://github.com/vanilla-dpup/woof-CE ../woof-CE
     - name: Create cache directories
       run: |
         mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
@@ -127,15 +127,15 @@ jobs:
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
         sudo mv kernel-kit/output/kernel_sources-*.sfs woof-output-*/
         cd woof-output-*
-        sudo tar -f $GITHUB_WORKSPACE/vanilladpup-9.9.${{ github.run_number }}-extra.tar -c docx_vanilladpup_9.9.${{ github.run_number }}.sfs nlsx_vanilladpup_9.9.${{ github.run_number }}.sfs kernel_sources-*.sfs
+        sudo tar -f $GITHUB_WORKSPACE/vanilladpup-10.0.${{ github.run_number }}-extra.tar -c docx_vanilladpup_10.0.${{ github.run_number }}.sfs nlsx_vanilladpup_10.0.${{ github.run_number }}.sfs kernel_sources-*.sfs
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}-${{ matrix.variant }}
-        release_name: vanilladpup-${{ matrix.arch }}-9.9.${{ github.run_number }}-${{ matrix.variant }}
+        tag_name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
+        release_name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
         prerelease: false
     - name: Upload ISO image
       uses: actions/upload-release-asset@v1
@@ -143,8 +143,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.9.${{ github.run_number }}.iso
-        asset_name: vanilladpup-9.9.${{ github.run_number }}.iso
+        asset_path: vanilladpup-10.0.${{ github.run_number }}.iso
+        asset_name: vanilladpup-10.0.${{ github.run_number }}.iso
         asset_content_type: application/octet-stream
     - name: Upload extras
       uses: actions/upload-release-asset@v1
@@ -152,14 +152,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-9.9.${{ github.run_number }}-extra.tar
-        asset_name: vanilladpup-9.9.${{ github.run_number }}-extra.tar
+        asset_path: vanilladpup-10.0.${{ github.run_number }}-extra.tar
+        asset_name: vanilladpup-10.0.${{ github.run_number }}-extra.tar
         asset_content_type: application/octet-stream
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@v0.2.0
       with:
         keep_latest: 2
-        delete_tag_pattern: vanilladpup-${{ matrix.arch }}-9.9.
+        delete_tag_pattern: vanilladpup-${{ matrix.arch }}-10.0.
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
