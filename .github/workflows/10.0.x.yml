@@ -1,4 +1,4 @@
-name: saturday
+name: 10.0.x
 
 on:
   schedule:
@@ -56,8 +56,8 @@ jobs:
         cd ../woof-CE
         yes "" | sudo -E ./merge2out woof-distro/${{ matrix.arch }}/debian/${{ matrix.compat-distro-version }}
         sudo chown -R root:root ../woof-out_*
-    - name: Set distro version
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=9.9.${{ github.run_number }}/ ../woof-out_*/DISTRO_SPECS
+    - name: Set distro name and version
+      run: sudo sed -i -e 's/^DISTRO_NAME=.*/DISTRO_NAME="Vanilla Dpup"/' -e s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=vanilladpup/ -e s/^DISTRO_VERSION=.*/DISTRO_VERSION=10.0.${{ github.run_number }}/ ../woof-out_*/DISTRO_SPECS
     - name: 0setup
       timeout-minutes: 10
       run: |
