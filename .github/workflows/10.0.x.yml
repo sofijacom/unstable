@@ -18,10 +18,10 @@ jobs:
             variant: dwl
           - arch: x86_64
             compat-distro-version: bookworm64
-            variant: xwayland
+            variant: jwm
           - arch: x86
             compat-distro-version: bookworm
-            variant: xwayland
+            variant: jwm
     steps:
     - name: Clone woof-CE
       run: git clone -b vanilladpup-10.0.x --depth 1 https://github.com/vanilla-dpup/woof-CE ../woof-CE
