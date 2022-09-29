@@ -78,7 +78,7 @@ jobs:
       with:
         repo: puppylinux-woof-CE/woof-CE
         branch: testing
-        workflow: kernel-kit.yml
+        workflow: dpup-kernel.yml
         workflow_conclusion: success
         name: kernel-kit-output-usrmerge-overlay-debian-bookworm-${{ matrix.arch }}
         path: output
