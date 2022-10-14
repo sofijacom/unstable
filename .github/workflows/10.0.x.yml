@@ -139,6 +139,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
+        tag_name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
         fail_on_unmatched_files: true
         files: |
           vanilladpup-10.0.${{ github.run_number }}.iso
