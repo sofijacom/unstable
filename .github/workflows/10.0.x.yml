@@ -37,18 +37,17 @@ jobs:
         mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
         ln -s `pwd`/local-repositories ../local-repositories
     - name: Get cache key timestamp
-      id: get_cache_key_timestamp
       run: |
-        echo "::set-output name=timestamp::$(/bin/date -u "+%Y%U")"
+        echo "timestamp=$(/bin/date -u "+%Y%U")" >> $$GITHUB_ENV
       shell: bash
     - name: Get cached local-repositories
       if: github.event_name != 'workflow_dispatch'
       uses: actions/cache@v2
       with:
         path: local-repositories
-        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-local-repositories-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-${{ github.sha }}
+        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-local-repositories-${{ env.timestamp }}-${{ github.sha }}
         restore-keys: |
-          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-local-repositories-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-
+          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-local-repositories-${{ env.timestamp }}-
     - name: Prepare build environment
       run: |
         [ -f local-repositories/vercmp ] || (curl https://raw.githubusercontent.com/puppylinux-woof-CE/initrd_progs/master/pkg/w_apps_static/w_apps/vercmp.c | gcc -x c -o ../local-repositories/vercmp -)
@@ -96,25 +95,25 @@ jobs:
       uses: actions/cache@v2
       with:
         path: petbuild-sources
-        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-sources-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-${{ github.sha }}
+        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-sources-${{ env.timestamp }}-${{ github.sha }}
         restore-keys: |
-          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-sources-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-
+          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-sources-${{ env.timestamp }}-
     - name: Get cached petbuild-cache
       if: matrix.arch == 'arm' && github.event_name != 'workflow_dispatch'
       uses: actions/cache@v2
       with:
         path: petbuild-cache
-        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-cache-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-${{ github.sha }}
+        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-cache-${{ env.timestamp }}-${{ github.sha }}
         restore-keys: |
-          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-cache-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-
+          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-cache-${{ env.timestamp }}-
     - name: Get cached petbuild-output
       if: github.event_name != 'workflow_dispatch'
       uses: actions/cache@v2
       with:
         path: petbuild-output
-        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-output-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-${{ github.sha }}
+        key: ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-output-${{ env.timestamp }}-${{ github.sha }}
         restore-keys: |
-          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-output-${{ steps.get_cache_key_timestamp.outputs.timestamp }}-
+          ${{ github.workflow }}-${{ matrix.arch }}-debian-${{ matrix.compat-distro-version }}-petbuild-output-${{ env.timestamp }}-
     - name: Install 3builddistro dependencies
       run: |
         sudo apt-get update -qq
@@ -137,31 +136,13 @@ jobs:
         sudo tar -f $GITHUB_WORKSPACE/vanilladpup-10.0.${{ github.run_number }}-extra.tar -c docx_vanilladpup_10.0.${{ github.run_number }}.sfs nlsx_vanilladpup_10.0.${{ github.run_number }}.sfs kernel_sources-*.sfs
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
-        release_name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
-        prerelease: false
-    - name: Upload ISO image
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-10.0.${{ github.run_number }}.iso
-        asset_name: vanilladpup-10.0.${{ github.run_number }}.iso
-        asset_content_type: application/octet-stream
-    - name: Upload extras
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: vanilladpup-10.0.${{ github.run_number }}-extra.tar
-        asset_name: vanilladpup-10.0.${{ github.run_number }}-extra.tar
-        asset_content_type: application/octet-stream
+        name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
+        fail_on_unmatched_files: true
+        files: |
+          vanilladpup-10.0.${{ github.run_number }}.iso
+          vanilladpup-10.0.${{ github.run_number }}-extra.tar
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@v0.2.0
       with:
