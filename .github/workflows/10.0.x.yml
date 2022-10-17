@@ -133,7 +133,7 @@ jobs:
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
         sudo mv kernel-kit/output/kernel_sources-*.sfs woof-output-*/
         cd woof-output-*
-        sudo tar -f $GITHUB_WORKSPACE/vanilladpup-10.0.${{ github.run_number }}-extra.tar -c docx_vanilladpup_10.0.${{ github.run_number }}.sfs nlsx_vanilladpup_10.0.${{ github.run_number }}.sfs kernel_sources-*.sfs
+        sudo tar -f $GITHUB_WORKSPACE/vanilladpup-10.0.${{ github.run_number }}-extra.tar -c kernel_sources-*.sfs
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
