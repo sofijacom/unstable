@@ -19,6 +19,7 @@ jobs:
       compat-distro: debian
       compat-distro-version: bookworm64
       kernel: debian-bookworm
+      prefix: vanilladpup
       unionfs: overlay
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-xorg
       retention: 1
@@ -34,6 +35,7 @@ jobs:
       compat-distro: debian
       compat-distro-version: bookworm64
       kernel: debian-bookworm
+      prefix: vanilladpup
       unionfs: overlay
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-xwayland
       retention: 1
@@ -48,6 +50,7 @@ jobs:
       arch: x86_64
       compat-distro: debian
       compat-distro-version: bookworm64
+      prefix: vanilladpup
       kernel: debian-bookworm
       unionfs: overlay
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-dwl
@@ -64,6 +67,7 @@ jobs:
       compat-distro: debian
       compat-distro-version: bookworm
       kernel: debian-bookworm
+      prefix: vanilladpup
       unionfs: overlay
       artifact: vanilladpup-x86-10.0.${{ github.run_number }}-xorg
       retention: 1
