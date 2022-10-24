@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  build-xorg64:
+  xorg64:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
       repo: vanilla-dpup/woof-CE
@@ -23,7 +23,7 @@ jobs:
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-xorg
       retention: 1
       variant: xorg
-  build-xwayland64:
+  xwayland64:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
       repo: vanilla-dpup/woof-CE
@@ -38,7 +38,7 @@ jobs:
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-xwayland
       retention: 1
       variant: xwayland
-  build-dwl64:
+  dwl64:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
       repo: vanilla-dpup/woof-CE
@@ -53,7 +53,7 @@ jobs:
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-dwl
       retention: 1
       variant: dwl
-  build-xorg32:
+  xorg32:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
       repo: vanilla-dpup/woof-CE
@@ -69,7 +69,7 @@ jobs:
       retention: 1
       variant: xorg
   upload:
-    needs: [build-xorg64, build-xwayland64, build-dwl64, build-xorg32]
+    needs: [xorg64, xwayland64, dwl64, xorg32]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
