@@ -18,7 +18,7 @@ jobs:
       compat-distro-version: bullseye64
       kernel: debian-bullseye
       prefix: vanilladpup
-      artifact: vanilladpup-x86_64-9.3.0-beta${{ github.run_number }}-xorg
+      artifact: vanilladpup-x86_64-9.3.0-beta${{ github.run_number }}
       retention: 1
   x86:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
@@ -32,7 +32,7 @@ jobs:
       compat-distro-version: bullseye
       kernel: debian-bullseye
       prefix: vanilladpup
-      artifact: vanilladpup-x86-9.3.0-beta${{ github.run_number }}-xorg
+      artifact: vanilladpup-x86-9.3.0-beta${{ github.run_number }}
       retention: 1
   upload:
     needs: [x86_64, x86]
