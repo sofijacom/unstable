@@ -8,6 +8,21 @@ on:
       - master
 
 jobs:
+  retro64:
+    uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
+    with:
+      repo: vanilla-dpup/woof-CE
+      ref: vanilladpup-10.0.x
+      name: "Vanilla Dpup"
+      version: 10.0.${{ github.run_number }}
+      arch: x86_64
+      compat-distro: debian
+      compat-distro-version: bookworm64
+      kernel: debian-bullseye
+      prefix: vanilladpup
+      artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-retro
+      retention: 1
+      variant: retro
   xorg64:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
@@ -53,7 +68,7 @@ jobs:
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-dwl
       retention: 1
       variant: dwl
-  xorg32:
+  retro32:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
       repo: vanilla-dpup/woof-CE
@@ -63,13 +78,13 @@ jobs:
       arch: x86
       compat-distro: debian
       compat-distro-version: bookworm
-      kernel: debian-bookworm
+      kernel: debian-bullseye
       prefix: vanilladpup
-      artifact: vanilladpup-x86-10.0.${{ github.run_number }}-xorg
+      artifact: vanilladpup-x86-10.0.${{ github.run_number }}-retro
       retention: 1
       variant: xorg
   upload:
-    needs: [xorg64, xwayland64, dwl64, xorg32]
+    needs: [retro64, xorg64, xwayland64, dwl64, retro32]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -80,8 +95,10 @@ jobs:
             variant: xwayland
           - arch: x86_64
             variant: xorg
+          - arch: x86_64
+            variant: retro
           - arch: x86
-            variant: xorg
+            variant: retro
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v3
@@ -104,7 +121,7 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            keep: 3
+            keep: 4
           - arch: x86
             keep: 1
     steps:
