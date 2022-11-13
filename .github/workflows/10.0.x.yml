@@ -82,7 +82,7 @@ jobs:
       prefix: vanilladpup
       artifact: vanilladpup-x86-10.0.${{ github.run_number }}-retro
       retention: 1
-      variant: xorg
+      variant: retro
   upload:
     needs: [retro64, xorg64, xwayland64, dwl64, retro32]
     runs-on: ubuntu-20.04
