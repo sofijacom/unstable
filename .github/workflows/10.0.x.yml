@@ -105,6 +105,8 @@ jobs:
         with:
           name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
           path: .
+      - name: Rename ISO
+        run: mv -f *.iso vanilladpup-10.0.${{ github.run_number }}-${{ matrix.variant }}.iso
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
