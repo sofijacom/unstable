@@ -18,7 +18,7 @@ jobs:
       arch: x86_64
       compat-distro: debian
       compat-distro-version: bookworm64
-      kernel: debian-bullseye
+      kernel: debian-bookworm
       prefix: vanilladpup
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-retro
       retention: 1
@@ -78,7 +78,7 @@ jobs:
       arch: x86
       compat-distro: debian
       compat-distro-version: bookworm
-      kernel: debian-bullseye
+      kernel: debian-bookworm
       prefix: vanilladpup
       artifact: vanilladpup-x86-10.0.${{ github.run_number }}-retro
       retention: 1
