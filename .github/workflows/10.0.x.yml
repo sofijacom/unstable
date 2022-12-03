@@ -147,7 +147,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-       - arch: [x86_64, x86]
+        arch: [x86_64, x86]
     steps:
       - name: Delete old ${{ matrix.arch }} releases
         uses: dev-drprasad/delete-older-releases@v0.2.0
