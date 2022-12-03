@@ -83,54 +83,76 @@ jobs:
       artifact: vanilladpup-x86-10.0.${{ github.run_number }}-retro
       retention: 1
       variant: retro
-  upload:
-    needs: [retro64, xorg64, xwayland64, dwl64, retro32]
+  upload64:
+    needs: [retro64, xorg64, xwayland64, dwl64]
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        include:
-          - arch: x86_64
-            variant: dwl
-          - arch: x86_64
-            variant: xwayland
-          - arch: x86_64
-            variant: xorg
-          - arch: x86_64
-            variant: retro
-          - arch: x86
-            variant: retro
     steps:
-      - name: Download build artifact
+      - name: Download retro build artifact
         uses: actions/download-artifact@v3
         with:
-          name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
-          path: .
+          name: vanilladpup-x86_64-10.0.${{ github.run_number }}-retro
+          path: retro
+      - name: Download xorg build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: vanilladpup-x86_64-10.0.${{ github.run_number }}-xorg
+          path: xorg
+      - name: Download xwayland build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: vanilladpup-x86_64-10.0.${{ github.run_number }}-xwayland
+          path: xwayland
+      - name: Download dwl build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: vanilladpup-x86_64-10.0.${{ github.run_number }}-dwl
+          path: dwl
       - name: Rename ISO
-        run: mv -f *.iso vanilladpup-10.0.${{ github.run_number }}-${{ matrix.variant }}.iso
+        run: |
+          mv -f retro/*.iso vanilladpup-10.0.${{ github.run_number }}-retro.iso
+          mv -f xorg/*.iso vanilladpup-10.0.${{ github.run_number }}-xorg.iso
+          mv -f xwayland/*.iso vanilladpup-10.0.${{ github.run_number }}-xwayland.iso
+          mv -f dwl/*.iso vanilladpup-10.0.${{ github.run_number }}-dwl.iso
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
-          tag_name: vanilladpup-${{ matrix.arch }}-10.0.${{ github.run_number }}-${{ matrix.variant }}
+          name: vanilladpup-x86_64-10.0.${{ github.run_number }}
+          tag_name: vanilladpup-x86_64-10.0.${{ github.run_number }}
           fail_on_unmatched_files: true
           files: |
             *.iso
-            kernel_sources-*.sfs
+            retro/kernel_sources-*.sfs
+  upload32:
+    needs: retro32
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download retro build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: vanilladpup-x86-10.0.${{ github.run_number }}-retro
+          path: retro
+      - name: Rename ISO
+        run: mv -f retro/*.iso vanilladpup-10.0.${{ github.run_number }}-retro.iso
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: vanilladpup-x86-10.0.${{ github.run_number }}
+          tag_name: vanilladpup-x86-10.0.${{ github.run_number }}
+          fail_on_unmatched_files: true
+          files: |
+            *.iso
+            retro/kernel_sources-*.sfs
   cleanup:
-    needs: upload
+    needs: [upload64, upload32]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        include:
-          - arch: x86_64
-            keep: 4
-          - arch: x86
-            keep: 1
+       - arch: [x86_64, x86]
     steps:
       - name: Delete old ${{ matrix.arch }} releases
         uses: dev-drprasad/delete-older-releases@v0.2.0
         with:
-          keep_latest: ${{ matrix.keep }}
+          keep_latest: 1
           delete_tag_pattern: vanilladpup-${{ matrix.arch }}-10.0.
           delete_tags: true
         env:
