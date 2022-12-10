@@ -53,21 +53,6 @@ jobs:
       artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-xwayland
       retention: 1
       variant: xwayland
-  dwl64:
-    uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
-    with:
-      repo: vanilla-dpup/woof-CE
-      ref: vanilladpup-10.0.x
-      name: "Vanilla Dpup"
-      version: 10.0.${{ github.run_number }}
-      arch: x86_64
-      compat-distro: debian
-      compat-distro-version: bookworm64
-      prefix: vanilladpup
-      kernel: debian-bookworm
-      artifact: vanilladpup-x86_64-10.0.${{ github.run_number }}-dwl
-      retention: 1
-      variant: dwl
   retro32:
     uses: vanilla-dpup/woof-CE/.github/workflows/build.yml@vanilladpup-10.0.x
     with:
@@ -84,7 +69,7 @@ jobs:
       retention: 1
       variant: retro
   upload64:
-    needs: [retro64, xorg64, xwayland64, dwl64]
+    needs: [retro64, xorg64, xwayland64]
     runs-on: ubuntu-20.04
     steps:
       - name: Download retro build artifact
@@ -102,17 +87,11 @@ jobs:
         with:
           name: vanilladpup-x86_64-10.0.${{ github.run_number }}-xwayland
           path: xwayland
-      - name: Download dwl build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: vanilladpup-x86_64-10.0.${{ github.run_number }}-dwl
-          path: dwl
       - name: Rename ISO
         run: |
           mv -f retro/*.iso vanilladpup-10.0.${{ github.run_number }}-retro.iso
-          mv -f xorg/*.iso vanilladpup-10.0.${{ github.run_number }}-xorg.iso
+          mv -f xorg/*.iso vanilladpup-10.0.${{ github.run_number }}.iso
           mv -f xwayland/*.iso vanilladpup-10.0.${{ github.run_number }}-xwayland.iso
-          mv -f dwl/*.iso vanilladpup-10.0.${{ github.run_number }}-dwl.iso
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
