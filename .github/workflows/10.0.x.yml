@@ -150,7 +150,7 @@ jobs:
         arch: [x86_64, x86]
     steps:
       - name: Delete old ${{ matrix.arch }} releases
-        uses: dev-drprasad/delete-older-releases@v0.2.0
+        uses: dev-drprasad/delete-older-releases@v0.2.1
         with:
           keep_latest: 1
           delete_tag_pattern: vanilladpup-${{ matrix.arch }}-10.0.
