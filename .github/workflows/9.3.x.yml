@@ -46,6 +46,8 @@ jobs:
         with:
           name: vanilladpup-${{ matrix.arch }}-9.3.0-beta${{ github.run_number }}
           path: .
+      - name: Rename ISO
+        run: mv -f *.iso vanilladpup-9.3.0-beta${{ github.run_number }}.iso
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
