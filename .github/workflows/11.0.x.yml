@@ -17,8 +17,8 @@ jobs:
       version: 11.0.${{ github.run_number }}
       arch: x86_64
       compat-distro: debian
-      compat-distro-version: sid64
-      kernel: debian-sid
+      compat-distro-version: trixie64
+      kernel: debian-trixie
       prefix: vanilladpup
       artifact: vanilladpup-x86_64-11.0.${{ github.run_number }}-labwc
       retention: 1
