@@ -44,6 +44,7 @@ jobs:
           files: |
             *.img.gz
             labwc/kernel_sources-*.sfs
+            labwc/woof-CE.tar.gz
   cleanup:
     needs: [upload64]
     runs-on: ubuntu-20.04
