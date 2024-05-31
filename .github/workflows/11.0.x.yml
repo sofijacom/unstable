@@ -43,7 +43,6 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             *.img.gz
-            labwc/kernel_sources-*.sfs
             labwc/woof-CE.tar.gz
   cleanup:
     needs: [upload64]
